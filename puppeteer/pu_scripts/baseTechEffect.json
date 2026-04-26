@@ -1,0 +1,11 @@
+{
+  "name" : "pu_placeholder",
+  "effectConfig" : {},
+  "defaultDuration" : 10,
+
+  "scripts" : [
+    "/pu_scripts/techeffect.lua"
+  ],
+  
+  "animationConfig" : "placeholder.animation"
+}

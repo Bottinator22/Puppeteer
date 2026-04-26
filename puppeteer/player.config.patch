@@ -1,0 +1,3 @@
+[
+{ "op" : "add", "path" : "/deploymentConfig/scripts/-", "value" : "/pu_scripts/deploy.lua" }
+]

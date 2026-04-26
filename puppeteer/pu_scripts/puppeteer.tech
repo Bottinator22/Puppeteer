@@ -1,0 +1,13 @@
+{
+  "name" : "puppeteer",
+  "type" : "head",
+
+  "scripts" : ["/pu_scripts/tech.lua"],
+
+  "description" : "control.",
+  "shortDescription" : "^#ffffff;Puppeteer^reset;",
+  "rarity" : "Legendary",
+  "icon" : "/tech/airdash.png",
+
+  "chipCost" : 0
+}

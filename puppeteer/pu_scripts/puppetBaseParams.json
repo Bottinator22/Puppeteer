@@ -1,0 +1,8 @@
+ 
+{
+    "clientEntityMode": "clientPresenceMaster",
+    "disableWornArmor": false,
+    "scripts": [
+        "/pu_scripts/puppet.lua"
+    ]
+}

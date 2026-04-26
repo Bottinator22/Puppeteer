@@ -1,0 +1,9 @@
+{
+  "name" : "pu_directives",
+  "effectConfig" : {},
+  "defaultDuration" : 10,
+
+  "scripts" : [
+    "directives.lua"
+  ]
+}

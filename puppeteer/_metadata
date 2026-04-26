@@ -1,0 +1,7 @@
+{
+  "name" : "puppeteer",
+  "requires": ["abysscore"],
+  "scripts" : {
+    "postLoad" : ["/pu_scripts/postLoad.lua"]
+  }
+}

@@ -1,0 +1,81 @@
+{
+    
+    "animation" : "/monsters/mechdrone/multidrone/mechmultidrone.animation",
+    
+    "movementSettings" : {
+      "collisionPoly": [
+        [
+          -0.5,
+          0.5
+        ],
+        [
+          0.5,
+          0.5
+        ],
+        [
+          0.5,
+          -0.5
+        ],
+        [
+          -0.5,
+          -0.5
+        ]
+      ],
+      "collisionEnabled": false,
+
+      "mass" : 2.0,
+      "walkSpeed" : 35,
+      "runSpeed" : 35,
+
+      "bounceFactor" : 0,
+      "groundFriction" : 10,
+      "gravityEnabled" : false,
+
+      "airFriction" : 0,
+      "liquidFriction": 0,
+      "liquidBuoyancy": 0.0
+    },
+    
+    "script": "/pu_scripts/puppeteer.lua",
+    "scriptDelta": 1,
+    "clientEntityMode": "clientPresenceMaster",
+    
+    "animationCustom":{
+      "animatedParts" : {
+        "stateTypes" : {
+          "droneState": {
+            "default" : "null",
+            "states": {
+              "null": {},
+              "active": {
+                "properties": {
+                  "persistentSound": ""
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "transformationGroups" : {
+        "body" : { "interpolated" : true },
+        "flip": {"interpolated": false},
+        "rotation": {"interpolated": false}
+      },
+      "effects" : {
+      },
+      "particleEmitters" : null,
+      "lights" : {
+      },
+
+      "sounds" : {
+        "fire" : []
+      }
+    },
+    "physicsCollisions": {
+      "platform": {
+        "enabled": false
+      }
+    },
+    "loungePositions": null
+} 

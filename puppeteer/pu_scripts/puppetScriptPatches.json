@@ -1,0 +1,4 @@
+{
+    "/stats/sb_player_primary.lua":"/pu_scripts/patches/sb_player_primary.lua",
+    "/scripts/player/sb_main.lua":"/pu_scripts/patches/sb_main.lua"
+} 

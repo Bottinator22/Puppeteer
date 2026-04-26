@@ -1,0 +1,18 @@
+{
+  "puppeteer": {
+    "groups": {
+      "actions": { "name": "Actions" }
+    },
+    "name": "Puppeteer",
+    "binds": {
+      "interact": {
+        "default": [{
+          "type" : "key",
+          "value" : "E"
+        }],
+        "group": "actions",
+        "name": "Interact"
+      }
+    }
+  }
+} 
