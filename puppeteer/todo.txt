@@ -1,0 +1,4 @@
+- Puppet inventory interface
+- DPC compatibility
+- See how SCCRP's prox works, compat with that
+- data for SCC to recognize Puppeteer commands

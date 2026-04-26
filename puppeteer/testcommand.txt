@@ -1,1 +1,0 @@
-/run require "/pu_scripts/puppetBuilder.lua"; buildPuppet(player.save()) 
