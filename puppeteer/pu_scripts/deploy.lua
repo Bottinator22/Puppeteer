@@ -1,3 +1,4 @@
+local puppetPostUpdateQueue = {}
 local oldInit = init
 function init()
     local function getPuppeteer()
@@ -27,6 +28,11 @@ function init()
     -- messages for other mods to integrate with it
     message.setHandler("pu_useSave",relayToPuppeteer)
     message.setHandler("pu_createPuppet",relayToPuppeteer)
+    
+    message.setHandler("pu_queuePostUpdate", function(_,l,e)
+        if not l then return end
+        table.insert(puppetPostUpdateQueue,e)
+    end)
     oldInit()
 end
 
@@ -48,4 +54,8 @@ function update(dt)
     for k,v in next, es do
         world.callScriptedEntity(v, "pu_updateDrawables")
     end
+    for k,v in next, puppetPostUpdateQueue do
+        world.callScriptedEntity(v, "pu_postUpdate")
+    end
+    puppetPostUpdateQueue = {}
 end

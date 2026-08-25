@@ -59,7 +59,7 @@ function init()
             -- try again with case sensitivity
             out = nil
             num = 0
-            sn = string.lower(removeDirectives(n))
+            sn = removeDirectives(n)
             
             for k,v in next, storage.saves do
                 if string.sub(removeDirectives(v.identity.name),1,#sn) == sn then

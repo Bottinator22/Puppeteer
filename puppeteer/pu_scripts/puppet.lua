@@ -15,6 +15,7 @@ require "/pu_scripts/puppetCompanions.lua"
 -- last 8 bits (least significant bits) are vanilla slots, the first 12 are the extra ones
 
 local function nullFunc() end
+local function falseFunc() return false end
 placeholderMT = {
     __index = function(t,k)
         return nullFunc
@@ -66,7 +67,7 @@ setmetatable(puppetInput, {__index=function(t,k)
     elseif ai then
         return ai.getInputFunc(k)
     else
-        return nullFunc
+        return falseFunc
     end
 end})
 localAnimator = nil
@@ -552,18 +553,31 @@ function init()
         return save.shipUpgrades
     end
     player.humanoidIdentity = npc.humanoidIdentity
-    function player.description()
-        return "Some funny looking person"
+    player.setHumanoidIdentity = npc.setHumanoidIdentity
+    if npc.description then
+        player.description = npc.description
+    else
+        function player.description()
+            return "Some funny looking person"
+        end
     end
     local function buildIdentityCallback(n)
-        player[n] = function()
-            return npc.humanoidIdentity()[n]
+        if npc[n] then
+            player[n] = npc[n]
+        else
+            player[n] = function()
+                return npc.humanoidIdentity()[n]
+            end
         end
     end
     local function buildHairCallback(n)
-        player[n] = function()
-            local i = npc.humanoidIdentity()
-            return i[n.."Group"],i[n.."Type"],i[n.."Directives"]
+        if npc[n] then
+            player[n] = npc[n]
+        else
+            player[n] = function()
+                local i = npc.humanoidIdentity()
+                return i[n.."Group"],i[n.."Type"],i[n.."Directives"]
+            end
         end
     end
     buildIdentityCallback("bodyDirectives")
@@ -581,17 +595,56 @@ function init()
     buildIdentityCallback("species")
     buildIdentityCallback("imagePath")
     buildIdentityCallback("gender")
-    function player.personality()
-        local identity = npc.humanoidIdentity()
-        return {
-            idle=identity.personalityIdle,
-            armIdle=identity.personalityArmIdle,
-            headOffset=identity.personalityHeadOffset,
-            armOffset=identity.personalityArmOffset
-        }
+    if npc.personality then
+        player.personality = npc.personality
+    else
+        function player.personality()
+            local identity = npc.humanoidIdentity()
+            return {
+                idle=identity.personalityIdle,
+                armIdle=identity.personalityArmIdle,
+                headOffset=identity.personalityHeadOffset,
+                armOffset=identity.personalityArmOffset
+            }
+        end
     end
-    function player.favouriteColor()
-        return npc.humanoidIdentity().color
+    if npc.favoriteColor then
+        player.favoriteColor = npc.favoriteColor
+    else
+        function player.favouriteColor()
+            return npc.humanoidIdentity().color
+        end
+    end
+    -- a bunch of direct callback ports
+    for _,v in next, {
+        "setHumanoidParameter",
+        "getHumanoidParameter",
+        "setHumanoidParameters",
+        "getHumanoidParameters",
+        "refreshHumanoidParameters",
+        "humanoidConfig",
+        "setBodyDirectives",
+        "setEmoteDirectives",
+        "setHairGroup",
+        "setHairType",
+        "setHairDirectives",
+        "setFacialHairGroup",
+        "setFacialHairType",
+        "setFacialHairDirectives",
+        "setFacialHair",
+        "setFacialMask",
+        "setHair",
+        "setDescription",
+        "setName",
+        "setSpecies",
+        "setImagePath",
+        "setGender",
+        "setPersonality",
+        "setFavoriteColor"
+    } do
+        if npc[v] then
+            player[v] = npc[v]
+        end
     end
     player.setDamageTeam = npc.setDamageTeam
     player.say = npc.say
@@ -779,12 +832,14 @@ function init()
             if type(cfg) == "string" then
                 cfg = root.assetJson(cfg)
             end
-            local nscripts = {table.unpack(cfg.scripts)}
-            table.insert(nscripts,"/pu_scripts/puppetInterfacePatch_post.lua")
-            cfg = sb.jsonMerge(cfg,{
-                scripts=nscripts,
-                pu_puppetId=entity.id()
-            })
+            if cfg.scripts and #cfg.scripts > 0 then
+                local nscripts = {table.unpack(cfg.scripts)}
+                table.insert(nscripts,"/pu_scripts/puppetInterfacePatch_post.lua")
+                cfg = sb.jsonMerge(cfg,{
+                    scripts=nscripts,
+                    pu_puppetId=entity.id()
+                })
+            end
         end
         mainPlayer.interact(iType,cfg,src)
     end
@@ -825,6 +880,12 @@ function init()
         displayNametag = (not n) or #n > 0
         npc.setDisplayNametag(displayNametag)
     end
+    function player.headRotation()
+        return 0
+    end
+    function player.facingDirection()
+        return mcontroller.facingDirection()
+    end
     
     -- I'm probably not gonna implement half the functions due to npc limitations and otherwise making no sense to do so
     fillPlaceholders(player,mainPlayer)
@@ -842,6 +903,13 @@ function init()
         end,
         clearLightSources=function()
             table.clear(lights)
+        end,
+        playAudio=function(...)
+            local s = mainLocalAnimator.playAudio(...)
+            if s then
+                -- TODO: return the sound once TerraLib can handle it. for now just don't return a sound
+                s:setPosition(mcontroller.position())
+            end
         end,
         isPuppet=true
     }
@@ -959,7 +1027,7 @@ function setSave(nsave)
     end
     -- TODO: tech controller should probably act as if movement updated before it, not after,
     -- rn things are detaching due to velocity
-    local genericInvokables = {"init","update","uninit"}
+    local genericInvokables = {"init","update","uninit","postUpdate"}
     for k,v in next, configs.player.genericScriptContexts do
         local storage = sb.jsonMerge({},save.genericScriptStorage[k])
         local subMcontroller = buildSubMcontroller(safeTables.mcontroller)
@@ -967,6 +1035,9 @@ function setSave(nsave)
         genericContexts[k] = buildContext_strict({patched(v)},tables,storage,genericInvokables,{subMcontroller=subMcontroller})
     end
     techController = setupTechController(save.techs, save.techController, configs)
+    if npc.setDescription then
+        npc.setDescription(save.description)
+    end
     --npc.setUniqueId(save.uuid)
     storage.uuid = storage.uuid or sb.makeUuid()
     npc.setUniqueId(storage.uuid)
@@ -1129,7 +1200,6 @@ function update(dt)
         chat.addMessage("Puppeteer no longer active, resetting control")
         setControlling(false)
     end
-    local directives = ""
     storage.hadData = true
     deployment.update(dt)
     companions.update(dt)
@@ -1199,17 +1269,28 @@ function update(dt)
     lastInteract = puppetInput.bindHeld("puppeteer","interact")
     techController.setAim(aim)
     techController.update(updateArgs)
-    for k,v in next, genericContexts do
-        v.update(dt)
-        v.mcontroller.update()
-    end
+    local directives = ""
     if techController.hidden() then
-        directives = "?multiply=00000000"
+        directives = "?multiply=0000"
     else
         directives = techController.directives()
     end
     world.sendEntityMessage(entity.id(),"puppet_setDirectives",directives)
+    for k,v in next, genericContexts do
+        v.update(dt)
+        v.mcontroller.update()
+    end
+    if world.mainPlayer() and not world.headless then
+        world.sendEntityMessage(world.mainPlayer(),"pu_queuePostUpdate",entity.id())
+    end
 end
+
+function pu_postUpdate()
+    for k,v in next, genericContexts do
+        v.postUpdate()
+    end
+end
+
 -- Engine callback - called on interact
 function interact(args)
 end

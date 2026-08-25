@@ -139,6 +139,7 @@ function setupTechController(techs,techController)
     function controller.availableTechs()
     end
     function controller.equippedTech(s)
+        return techSlots[s].name
     end
     function controller.hidden()
         for k,v in next, techSlots do
