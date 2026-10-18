@@ -7,5 +7,7 @@
     "/pu_scripts/techeffect.lua"
   ],
   
+  "includeBack":true,
+  
   "animationConfig" : "placeholder.animation"
 }

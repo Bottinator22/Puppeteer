@@ -1142,26 +1142,6 @@ for k,v in next, commandToPass do
         end
     end
 end
---[[
--- example ai updateOrders
-function updateOrders(current)
-  local done = false
-  local mePos = mcontroller.position()
-  if current.type == "suicide" then
-    status.setResourcePercentage("health",0)
-  end
-  if current.type == "attack" then
-    done = not world.entityExists(current.target)
-    if not done then
-      overrideTargetId = current.target
-    end
-  end
-  if current.type == "attackpos" then
-    overrideTargetingPos = current.target
-  end
-  return done
-end
-]]
 
 local function localToLocal(pos)
     return world.distance(vec2.add(mcontroller.position(),pos), world.entityPosition(world.mainPlayer()))
@@ -1280,12 +1260,15 @@ function update(dt)
         v.update(dt)
         v.mcontroller.update()
     end
-    if world.mainPlayer() and not world.headless then
+    if not world.headless and world.mainPlayer() and world.entityExists(world.mainPlayer()) then
         world.sendEntityMessage(world.mainPlayer(),"pu_queuePostUpdate",entity.id())
     end
 end
 
-function pu_postUpdate()
+function abyss_needsPostUpdate()
+    return true
+end
+function abyss_postUpdate()
     for k,v in next, genericContexts do
         v.postUpdate()
     end

@@ -1,5 +1,7 @@
 -- prevent cross-context smuggling
 -- this should work fine. but it might not.
+
+-- terra_proxy should get around this by just using the shared table instead when possible.
 for k,v in next, _ENV do
     if type(v) == "table" then
         _ENV[k] = setmetatable({},{__index=v})

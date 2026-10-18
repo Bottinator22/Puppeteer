@@ -1,4 +1,5 @@
 require "/pu_scripts/puppetBuilder.lua"
+require "/scripts/terra_proxy.lua"
 
 function pu_isPuppeteer()
     return true
@@ -26,6 +27,7 @@ function tryControlPuppet(e)
 end
 function init()
     vehicle.setInteractive(false)
+    player = player or terra_proxy.setupProxy("player",world.mainPlayer())
     storage.puppets = storage.puppets or {}
     storage.saves = storage.saves or {}
     local function removeDirectives(n)
@@ -91,7 +93,7 @@ function init()
     end)
     message.setHandler("/getSave", function(_,l)
         if not l then return "no" end
-        local save = world.sendEntityMessage(world.mainPlayer(),"player.save"):result()
+        local save = player and player.save and player.save()
         if not save then
             return "Could not get save. Player table is likely not exposed by proxy."
         end
@@ -105,7 +107,7 @@ function init()
     end)
     message.setHandler("/controlPuppet", function(_,l)
         if not l then return "no" end
-        local aim = world.sendEntityMessage(world.mainPlayer(),"player.aimPosition"):result()
+        local aim = player.aimPosition()
         local e = world.npcQuery(aim,2,{
             callScript="pu_isPuppet",
             order="nearest"
@@ -125,7 +127,7 @@ function init()
     end)
     message.setHandler("/puc", function(_,l,c)
         if not l then return "no" end
-        local aim = world.sendEntityMessage(world.mainPlayer(),"player.aimPosition"):result()
+        local aim = player.aimPosition()
         if not aim then
             return "Could not get aim. Player table is likely not exposed by proxy."
         end

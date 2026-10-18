@@ -1,5 +1,0 @@
-{
-  "worldScriptContexts":{
-	"pu_puppeteer": ["/pu_scripts/world.lua"]
-  }
-}
